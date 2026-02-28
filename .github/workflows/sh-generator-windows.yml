@@ -112,6 +112,9 @@ jobs:
         run: |
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install opus:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libvpx:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libyuv:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install onevpl:${{ matrix.job.vcpkg-triplet }}
 
       - name: Setup MSVC dev environment
         uses: ilammy/msvc-dev-cmd@v1
