@@ -99,7 +99,12 @@ jobs:
         shell: pwsh
         run: |
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:x64-windows-static
-                
+
+      - name: Setup MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          
       - uses: actions/download-artifact@v4
         with:
           name: encrypted-secrets-zip
