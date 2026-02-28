@@ -95,6 +95,13 @@ jobs:
           & $env:RUNNER_TEMP\vcpkg\bootstrap-vcpkg.bat
           "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
 
+      - name: Setup vcpkg env
+        shell: pwsh
+        run: |
+          "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKG_INSTALLATION_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKG_DEFAULT_TRIPLET=x64-windows-static" | Out-File -FilePath $env:GITHUB_ENV -Append
+          
       - name: Install vcpkg deps
         shell: pwsh
         run: |
