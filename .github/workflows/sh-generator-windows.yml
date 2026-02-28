@@ -107,6 +107,12 @@ jobs:
           $h = "$env:RUNNER_TEMP\vcpkg\installed\${{ matrix.job.vcpkg-triplet }}\include\libavutil\pixfmt.h"
           if (!(Test-Path $h)) { throw "Missing header after vcpkg install: $h" }
 
+      - name: Install vcpkg deps
+        shell: pwsh
+        run: |
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install opus:${{ matrix.job.vcpkg-triplet }}
+
       - name: Setup MSVC dev environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -418,20 +424,35 @@ jobs:
           customHeaders: '{"Content-Type": "application/json"}'
           data: '{"uuid": "${{ env.uuid }}", "status": "50% complete"}'
 
+      - name: Debug vcpkg env
+        shell: pwsh
+        run: |
+          echo "VCPKG_ROOT=$env:VCPKG_ROOT"
+          echo "VCPKG_DEFAULT_TRIPLET=$env:VCPKG_DEFAULT_TRIPLET"
+
       - name: Build rustdesk
         shell: pwsh
         run: |
           $triplet = "${{ matrix.job.vcpkg-triplet }}"
-          $vcpkgInstalled = "$env:RUNNER_TEMP\vcpkg\installed\$triplet"
-
-          # Make sure our vcpkg headers/libs are used (not VS's bundled vcpkg)
+          $vcpkgRoot = "$env:RUNNER_TEMP\vcpkg"
+          $vcpkgInstalled = "$vcpkgRoot\installed\$triplet"
+      
+          # Force OUR vcpkg (not VS-bundled vcpkg)
+          $env:VCPKG_ROOT = $vcpkgRoot
+          $env:VCPKG_INSTALLATION_ROOT = $vcpkgRoot
+          $env:VCPKG_DEFAULT_TRIPLET = $triplet
+      
+          # Also force compiler include/lib search paths
           $env:INCLUDE = "$vcpkgInstalled\include;$env:INCLUDE"
           $env:LIB     = "$vcpkgInstalled\lib;$env:LIB"
-          $env:PATH    = "$env:RUNNER_TEMP\vcpkg;$env:PATH"
-
-          # Windows: build RustDesk
+      
+          # sanity check
+          if (!(Test-Path "$vcpkgInstalled\include\opus\opus_multistream.h")) {
+            throw "Missing opus headers: $vcpkgInstalled\include\opus\opus_multistream.h"
+          }
+      
           python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
-
+      
           if (!(Test-Path ".\flutter\build\windows\x64\runner\Release")) {
             throw "Flutter Release output not found – build failed earlier."
           }
