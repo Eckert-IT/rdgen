@@ -114,7 +114,13 @@ jobs:
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install opus:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libvpx:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libyuv:${{ matrix.job.vcpkg-triplet }}
-          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install onevpl:${{ matrix.job.vcpkg-triplet }} || echo "onevpl not available in this vcpkg commit"
+      
+          # optional (may not exist in this vcpkg commit)
+          try {
+            & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install onevpl:${{ matrix.job.vcpkg-triplet }}
+          } catch {
+            Write-Host "onevpl not available in this vcpkg commit - continuing without it"
+          }
 
       - name: Setup MSVC dev environment
         uses: ilammy/msvc-dev-cmd@v1
