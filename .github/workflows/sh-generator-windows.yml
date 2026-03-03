@@ -461,7 +461,8 @@ jobs:
             throw "Missing opus headers: $vcpkgInstalled\include\opus\opus_multistream.h"
           }
       
-          python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
+          # --- Original: python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
+          python3 .\build.py --portable --hwcodec --flutter --skip-portable-pack
       
           if (!(Test-Path ".\flutter\build\windows\x64\runner\Release")) {
             throw "Flutter Release output not found – build failed earlier."
