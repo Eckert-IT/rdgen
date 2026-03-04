@@ -106,11 +106,12 @@ jobs:
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:${{ matrix.job.vcpkg-triplet }}
           $h = "$env:RUNNER_TEMP\vcpkg\installed\${{ matrix.job.vcpkg-triplet }}\include\libavutil\pixfmt.h"
           if (!(Test-Path $h)) { throw "Missing header after vcpkg install: $h" }
-
+          
       - name: Install vcpkg deps
         shell: pwsh
         run: |
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install mfx-dispatch:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install opus:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libvpx:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libyuv:${{ matrix.job.vcpkg-triplet }}
