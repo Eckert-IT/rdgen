@@ -124,6 +124,14 @@ jobs:
             $global:LASTEXITCODE = 0
           }
 
+      - name: Verify libmfx present
+        shell: pwsh
+        run: |
+          $t = "${{ matrix.job.vcpkg-triplet }}"
+          $root = "$env:RUNNER_TEMP\vcpkg\installed\$t"
+          if (!(Test-Path "$root\lib\libmfx.lib")) { throw "Missing $root\lib\libmfx.lib" }
+          if (!(Test-Path "$root\include\mfx\mfxvideo.h")) { throw "Missing $root\include\mfx\mfxvideo.h" }
+
       - name: Setup MSVC dev environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
