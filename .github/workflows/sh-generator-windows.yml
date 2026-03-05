@@ -469,6 +469,24 @@ jobs:
           if (!(Test-Path "$vcpkgInstalled\include\opus\opus_multistream.h")) {
             throw "Missing opus headers: $vcpkgInstalled\include\opus\opus_multistream.h"
           }
+
+          # --- Flags hinzufuegen
+          $triplet = "${{ matrix.job.vcpkg-triplet }}"
+          $vcpkgRoot = "$env:RUNNER_TEMP\vcpkg"
+          $vcpkgInstalled = "$vcpkgRoot\installed\$triplet"
+          
+          $env:VCPKG_ROOT = $vcpkgRoot
+          $env:VCPKG_INSTALLATION_ROOT = $vcpkgRoot
+          $env:VCPKG_DEFAULT_TRIPLET = $triplet
+          
+          $env:INCLUDE = "$vcpkgInstalled\include;$env:INCLUDE"
+          $env:LIB     = "$vcpkgInstalled\lib;$env:LIB"
+          
+          # sanity checks
+          if (!(Test-Path "$vcpkgInstalled\lib\swresample.lib")) { throw "Missing swresample.lib: $vcpkgInstalled\lib\swresample.lib" }
+
+          # force-link missing libs
+          $env:RUSTFLAGS = "$env:RUSTFLAGS -l swresample -l mfuuid -l uuid"
       
           # --- Original: python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
           python3 .\build.py --portable --hwcodec --flutter --skip-portable-pack
