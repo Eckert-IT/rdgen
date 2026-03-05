@@ -79,7 +79,8 @@ jobs:
               target: x86_64-pc-windows-msvc,
               os: windows-2022,
               arch: x86_64,
-              vcpkg-triplet: x64-windows-static,
+              # -- vcpkg-triplet: x64-windows-static,
+              vcpkg-triplet: x64-windows,
             }
           # - { target: aarch64-pc-windows-msvc, os: windows-2022, arch: aarch64 }
     steps:
@@ -116,6 +117,7 @@ jobs:
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libvpx:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install libyuv:${{ matrix.job.vcpkg-triplet }}
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install aom:${{ matrix.job.vcpkg-triplet }}
+          & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install ffmpeg:${{ matrix.job.vcpkg-triplet }}
 
           # optional (may not exist in this vcpkg commit)
           & $env:RUNNER_TEMP\vcpkg\vcpkg.exe install onevpl:${{ matrix.job.vcpkg-triplet }}
@@ -486,7 +488,7 @@ jobs:
           if (!(Test-Path "$vcpkgInstalled\lib\swresample.lib")) { throw "Missing swresample.lib: $vcpkgInstalled\lib\swresample.lib" }
 
           # force-link missing libs
-          $env:RUSTFLAGS = "$env:RUSTFLAGS -l swresample -l mfuuid -l uuid"
+          $env:RUSTFLAGS = "$env:RUSTFLAGS -l swresample -l mfuuid -l uuid -l strmiids"
       
           # --- Original: python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
           python3 .\build.py --portable --hwcodec --flutter --skip-portable-pack
