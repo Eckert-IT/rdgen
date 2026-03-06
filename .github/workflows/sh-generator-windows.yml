@@ -628,18 +628,37 @@ jobs:
         run: |
           echo -n "${{ env.custom }}" | cat > ./rustdesk/custom_.txt
 
+
       - name: Build self-extracted executable
-        shell: bash
+        shell: pwsh
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
-          mv "./rustdesk/rustdesk.exe" "./rustdesk/${{ env.appname }}.exe" || echo "rustdesk.exe"
-          sed -i '/dpiAware/d' res/manifest.xml
-          pushd ./libs/portable
+          if (Test-Path "./rustdesk/rustdesk.exe") {
+            Move-Item "./rustdesk/rustdesk.exe" "./rustdesk/${{ env.appname }}.exe" -Force
+          } else {
+            Write-Host "rustdesk.exe not found, continuing"
+          }
+
+          (Get-Content "res/manifest.xml") | Where-Object { $_ -notmatch 'dpiAware' } | Set-Content "res/manifest.xml"
+
+          Push-Location "./libs/portable"
           pip3 install -r requirements.txt
+
+          # Wichtig: sicherstellen, dass MSVC-Linker benutzt wird
+          $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = "link.exe"
+
           python3 ./generate.py -f ../../rustdesk/ -o . -e "../../rustdesk/${{ env.appname }}.exe"
-          popd
-          mkdir -p ./SignOutput
-          mv ./target/release/rustdesk-portable-packer.exe "./SignOutput/rustdesk.exe"
+          Pop-Location
+
+          New-Item -ItemType Directory -Force -Path "./SignOutput" | Out-Null
+
+          if (Test-Path "./libs/portable/target/release/rustdesk-portable-packer.exe") {
+            Move-Item "./libs/portable/target/release/rustdesk-portable-packer.exe" "./SignOutput/rustdesk.exe" -Force
+          } elseif (Test-Path "./target/release/rustdesk-portable-packer.exe") {
+            Move-Item "./target/release/rustdesk-portable-packer.exe" "./SignOutput/rustdesk.exe" -Force
+          } else {
+            throw "rustdesk-portable-packer.exe was not created"
+          }
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
