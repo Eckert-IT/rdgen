@@ -79,8 +79,8 @@ jobs:
               target: x86_64-pc-windows-msvc,
               os: windows-2022,
               arch: x86_64,
-              # -- vcpkg-triplet: x64-windows-static,
-              vcpkg-triplet: x64-windows,
+              vcpkg-triplet: x64-windows-static,
+              # -- vcpkg-triplet: x64-windows,
             }
           # - { target: aarch64-pc-windows-msvc, os: windows-2022, arch: aarch64 }
     steps:
@@ -488,7 +488,7 @@ jobs:
           if (!(Test-Path "$vcpkgInstalled\lib\swresample.lib")) { throw "Missing swresample.lib: $vcpkgInstalled\lib\swresample.lib" }
 
           # force-link missing libs
-          $env:RUSTFLAGS = "$env:RUSTFLAGS -l swresample -l mfuuid -l uuid -l strmiids"
+          $env:RUSTFLAGS = "$env:RUSTFLAGS -C target-feature=+crt-static -l swresample -l mfuuid -l uuid -l strmiids"
       
           # --- Original: python3 .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
           python3 .\build.py --portable --hwcodec --flutter --skip-portable-pack
