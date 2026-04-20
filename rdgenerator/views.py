@@ -98,9 +98,9 @@ def generator_view(request):
             if not all(char.isascii() for char in appname):
                 appname = "rustdesk"
             myuuid = str(uuid.uuid4())
-            protocol = _settings.PROTOCOL
-            host = request.get_host()
-            # --- Korrektur: Port hinter Reverse Proxy-Server
+            # --- Korrektur: Port in URL für setup / download-zip
+            # --- protocol = _settings.PROTOCOL
+            # --- host = request.get_host()
             # --- full_url = f"{protocol}://{host}"
             full_url = f"{protocol}://{host}" if _settings.GENURL else f"{_settings.PROTOCOL}://{request.get_host()}"           
             try:
