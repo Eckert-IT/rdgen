@@ -102,7 +102,7 @@ def generator_view(request):
             host = request.get_host()
             # --- Korrektur: Port hinter Reverse Proxy-Server
             # --- full_url = f"{protocol}://{host}"
-            full_url = _settings.GENURL
+            full_url = f"{protocol}://{host}:4433"
             if _settings.GENURL else f"{_settings.PROTOCOL}://{request.get_host()}"           
             try:
                 iconfile = form.cleaned_data.get('iconfile')
